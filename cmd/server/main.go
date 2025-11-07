@@ -7,12 +7,13 @@ import (
 	"net/http"
 
 	"github.com/Gurveer1510/task-scheduler/internal/adaptors/persistance"
+	sch "github.com/Gurveer1510/task-scheduler/internal/adaptors/scheduler"
+	"github.com/Gurveer1510/task-scheduler/internal/adaptors/workers"
 	"github.com/Gurveer1510/task-scheduler/internal/config"
 	"github.com/Gurveer1510/task-scheduler/internal/core"
 	"github.com/Gurveer1510/task-scheduler/internal/interfaces/api/rest/handler"
 	"github.com/Gurveer1510/task-scheduler/internal/interfaces/api/rest/routes"
 	"github.com/Gurveer1510/task-scheduler/internal/usecase"
-	"github.com/Gurveer1510/task-scheduler/pkg"
 )
 
 func main() {
@@ -28,7 +29,6 @@ func main() {
 
 	router := routes.InitRoutes(&taskHandler)
 
-
 	cfg, err := config.LoadConfig()
 	if err != nil {
 		log.Fatal("PORT not found in config")
@@ -38,23 +38,15 @@ func main() {
 
 	taskChan := make(chan core.Task)
 
-	scheduler := persistance.NewScheduler(*db)
+	scheduler := sch.NewScheduler(*db)
+	workerPool := workers.NewWorkPool(3, taskChan)
 
-for i := range 3 {
-	go worker(i, taskChan)
-}
+	workerPool.Start()
+	go scheduler.RunScheduler(context.Background(), taskChan)
 
-go scheduler.RunScheduler(context.Background(), taskChan)
-err = http.ListenAndServe(fmt.Sprintf(":%s", port), router)
-if err != nil {
-	log.Fatalf("error in starting the server: %v", err)
-}
-
-}
-
-// worker processes tasks from the channel
-func worker(id int, ch <-chan core.Task) {
-	for task := range ch {
-		pkg.SendMsg(task.Payload)
+	err = http.ListenAndServe(fmt.Sprintf(":%s", port), router)
+	if err != nil {
+		log.Fatalf("error in starting the server: %v", err)
 	}
+
 }
