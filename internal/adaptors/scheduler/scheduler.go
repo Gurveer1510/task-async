@@ -43,8 +43,10 @@ func (s *Scheduler) RunScheduler(ctx context.Context, ch chan<- core.Task) {
 		case <-ticker.C:
 			var payloadJSON string
 			var task core.Task
-
-			row := s.Db.DB.QueryRow(ctx, query, time.Now())
+			// fmt.Println(time.Now())
+			loc, _ := time.LoadLocation("Asia/Kolkata")
+			t := time.Now().In(loc)
+			row := s.Db.DB.QueryRow(ctx, query, t)
 
 			err := row.Scan(&task.Id, &task.Name, &task.JobType, &payloadJSON, &task.RunAt, &task.Status, &task.CreatedAt)
 

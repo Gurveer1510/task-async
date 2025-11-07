@@ -20,3 +20,4 @@ func NewTaskUseCase(taskRepo persistance.TaskRepo) TaskUseCase {
 func (t *TaskUseCase) CreateTask(ctx context.Context, task core.Task) (core.Task, error) {
 	return t.TaskRepo.CreateTask(ctx, task)
 }
+

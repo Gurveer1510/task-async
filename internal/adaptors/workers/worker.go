@@ -2,6 +2,7 @@ package workers
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/Gurveer1510/task-scheduler/internal/core"
 	"github.com/Gurveer1510/task-scheduler/pkg"
@@ -29,7 +30,11 @@ func (w *WorkerPool) Worker(id int) {
 	fmt.Println("Worker started:", id)
 
 	for task := range w.Ch {
-		pkg.SendMsg(task.Payload)
+		err := pkg.SendMsg(task.Payload)
+		if err != nil {
+			log.Println("Could not send mail ERROR", err)
+		}
+		// err =
 	}
 
 }

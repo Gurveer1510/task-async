@@ -8,7 +8,7 @@ import (
 )
 
 
-func SendMsg(email core.Email) {
+func SendMsg(email core.Email) error {
 	from := "lannister251@gmail.com"
 	pass := "sjmfbqvxsqakfrfu"
 
@@ -21,7 +21,8 @@ func SendMsg(email core.Email) {
 	err := smtp.SendMail(host+":"+port, auth, from , []string{email.To}, msg)
 	if err != nil {
 		fmt.Println("Error:", err)
-		return
+		return err
 	}
 	fmt.Println("Email Sent !")
+	return nil
 }

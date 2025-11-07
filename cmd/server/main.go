@@ -48,5 +48,4 @@ func main() {
 	if err != nil {
 		log.Fatalf("error in starting the server: %v", err)
 	}
-
 }
