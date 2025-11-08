@@ -10,6 +10,7 @@ import (
 type TaskInterface interface  {
 	MarkAsDone(context.Context, core.Task) error
 	CreateTask(context.Context, core.Task) (core.Task,error)
+	MarkAsPending(context.Context, core.Task) error
 }
 
 type TaskRepo struct {
@@ -42,6 +43,12 @@ func (tk *TaskRepo) CreateTask(ctx context.Context, task core.Task) (core.Task, 
 
 func (t *TaskRepo) MarkAsDone(ctx context.Context, task core.Task) error {
 	query := `UPDATE tasks SET status='done' WHERE id=$1`
+
+	_, err := t.Db.DB.Exec(ctx, query, task.Id)
+	return err
+}
+func (t *TaskRepo) MarkAsPending(ctx context.Context, task core.Task) error {
+	query := `UPDATE tasks SET status='pending' WHERE id=$1`
 
 	_, err := t.Db.DB.Exec(ctx, query, task.Id)
 	return err

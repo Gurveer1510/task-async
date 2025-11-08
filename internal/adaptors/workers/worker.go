@@ -37,6 +37,7 @@ func (w *WorkerPool) Worker(id int) {
 		err := pkg.SendMsg(task.Payload)
 		if err != nil {
 			log.Println("Could not send mail ERROR", err)
+			w.TaskRepo.MarkAsPending(context.Background(), task)
 			continue
 		}
 		w.TaskRepo.MarkAsDone(context.Background(), task)
