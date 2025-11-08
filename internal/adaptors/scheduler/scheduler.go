@@ -43,9 +43,9 @@ func (s *Scheduler) RunScheduler(ctx context.Context, ch chan<- core.Task) {
 		case <-ticker.C:
 			var payloadJSON string
 			var task core.Task
-			// fmt.Println(time.Now())
-			loc, _ := time.LoadLocation("Asia/Kolkata")
-			t := time.Now().In(loc)
+
+			t := time.Now().UTC()
+
 			row := s.Db.DB.QueryRow(ctx, query, t)
 
 			err := row.Scan(&task.Id, &task.Name, &task.JobType, &payloadJSON, &task.RunAt, &task.Status, &task.CreatedAt)
@@ -54,10 +54,9 @@ func (s *Scheduler) RunScheduler(ctx context.Context, ch chan<- core.Task) {
 				if err == sql.ErrNoRows {
 					fmt.Println("No pending tasks....")
 					continue
-				} else {
-					fmt.Println("error in query", err, "still continuing to maintain flow")
-					continue
 				}
+				fmt.Println("error in query", err, "still continuing to maintain flow")
+				continue
 
 			}
 			if err := json.Unmarshal([]byte(payloadJSON), &task.Payload); err != nil {

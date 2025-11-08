@@ -39,7 +39,7 @@ func main() {
 	taskChan := make(chan core.Task)
 
 	scheduler := sch.NewScheduler(*db)
-	workerPool := workers.NewWorkPool(3, taskChan)
+	workerPool := workers.NewWorkPool(3, taskChan, taskRepo)
 
 	workerPool.Start()
 	go scheduler.RunScheduler(context.Background(), taskChan)

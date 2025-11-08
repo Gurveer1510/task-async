@@ -1,9 +1,11 @@
 package workers
 
 import (
+	"context"
 	"fmt"
 	"log"
 
+	"github.com/Gurveer1510/task-scheduler/internal/adaptors/persistance"
 	"github.com/Gurveer1510/task-scheduler/internal/core"
 	"github.com/Gurveer1510/task-scheduler/pkg"
 )
@@ -11,12 +13,14 @@ import (
 type WorkerPool struct {
 	NoOfWorkers int
 	Ch          <-chan core.Task
+	TaskRepo	persistance.TaskRepo
 }
 
-func NewWorkPool(noOfWorkers int, ch <-chan core.Task) *WorkerPool {
+func NewWorkPool(noOfWorkers int, ch <-chan core.Task, taskRepo persistance.TaskRepo) *WorkerPool {
 	return &WorkerPool{
 		NoOfWorkers: noOfWorkers,
 		Ch:          ch,
+		TaskRepo: taskRepo,
 	}
 }
 
@@ -33,8 +37,9 @@ func (w *WorkerPool) Worker(id int) {
 		err := pkg.SendMsg(task.Payload)
 		if err != nil {
 			log.Println("Could not send mail ERROR", err)
+			continue
 		}
-		// err =
+		w.TaskRepo.MarkAsDone(context.Background(), task)
 	}
 
 }

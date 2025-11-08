@@ -35,7 +35,7 @@ func (tk *TaskRepo) CreateTask(ctx context.Context, task core.Task) (core.Task, 
 	return task, nil
 }
 
-func (t *TaskRepo) MarkTaskDone(ctx context.Context, task core.Task) error {
+func (t *TaskRepo) MarkAsDone(ctx context.Context, task core.Task) error {
 	query := `UPDATE tasks SET status='done' WHERE id=$1`
 
 	_, err := t.Db.DB.Exec(ctx, query, task.Id)
