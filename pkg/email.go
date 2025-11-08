@@ -8,6 +8,17 @@ import (
 )
 
 
+// SendMsg sends an email using Gmail's SMTP server with hardcoded credentials (insecure).
+//
+// Example:
+//    err := packageName.SendMsg(core.Email{To: "recipient@example.com", Subject: "Hello", Body: "This is a test."})
+//    fmt.Println(err) // Expected output: <nil>
+//
+// Parameters:
+//    email core.Email - Email struct containing To, Subject, and Body fields.
+//
+// Returns:
+//    error - nil on success or a non-nil error if sending failed.
 func SendMsg(email core.Email) error {
 	from := "lannister251@gmail.com"
 	pass := "sjmfbqvxsqakfrfu"
