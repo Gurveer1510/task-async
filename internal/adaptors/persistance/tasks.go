@@ -7,6 +7,11 @@ import (
 	"github.com/Gurveer1510/task-scheduler/internal/core"
 )
 
+type TaskInterface interface  {
+	MarkAsDone(context.Context, core.Task) error
+	CreateTask(context.Context, core.Task) (core.Task,error)
+}
+
 type TaskRepo struct {
 	Db Database
 }
