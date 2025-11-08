@@ -1,16 +1,14 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/Gurveer1510/task-scheduler/internal/adaptors/persistance"
-	sch "github.com/Gurveer1510/task-scheduler/internal/adaptors/scheduler"
-	"github.com/Gurveer1510/task-scheduler/internal/adaptors/workers"
 	"github.com/Gurveer1510/task-scheduler/internal/config"
-	"github.com/Gurveer1510/task-scheduler/internal/core"
+	"github.com/Gurveer1510/task-scheduler/internal/infrastructure/persistance"
+	"github.com/Gurveer1510/task-scheduler/internal/infrastructure/queue"
+	"github.com/Gurveer1510/task-scheduler/internal/infrastructure/workers"
 	"github.com/Gurveer1510/task-scheduler/internal/interfaces/api/rest/handler"
 	"github.com/Gurveer1510/task-scheduler/internal/interfaces/api/rest/routes"
 	"github.com/Gurveer1510/task-scheduler/internal/usecase"
@@ -25,7 +23,8 @@ func main() {
 
 	taskRepo := persistance.NewTasksRepo(db)
 	taskService := usecase.NewTaskUseCase(taskRepo)
-	taskHandler := handler.NewTaskHandler(taskService)
+	queue := queue.NewMemoryQueue(10)
+	taskHandler := handler.NewTaskHandler(taskService, *queue)
 
 	router := routes.InitRoutes(&taskHandler)
 
@@ -36,13 +35,9 @@ func main() {
 
 	port := cfg.APP_PORT
 
-	taskChan := make(chan core.Task)
-
-	scheduler := sch.NewScheduler(*db)
-	workerPool := workers.NewWorkPool(3, taskChan, taskRepo)
+	workerPool := workers.NewWorkPool(3, taskRepo, *queue)
 
 	workerPool.Start()
-	go scheduler.RunScheduler(context.Background(), taskChan)
 
 	err = http.ListenAndServe(fmt.Sprintf(":%s", port), router)
 	if err != nil {
