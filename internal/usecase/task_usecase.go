@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/Gurveer1510/task-scheduler/internal/core"
-	"github.com/Gurveer1510/task-scheduler/internal/infrastructure/persistance"
+	"github.com/Gurveer1510/task-scheduler/internal/infrastructure/persistence"
 )
 
 type TaskUseCase struct {

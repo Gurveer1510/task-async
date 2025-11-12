@@ -6,9 +6,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/Gurveer1510/task-scheduler/internal/infrastructure/persistance"
+	"github.com/Gurveer1510/task-scheduler/internal/infrastructure/email"
+	"github.com/Gurveer1510/task-scheduler/internal/infrastructure/persistence"
 	"github.com/Gurveer1510/task-scheduler/internal/infrastructure/queue"
-	"github.com/Gurveer1510/task-scheduler/pkg"
 )
 
 type WorkerPool struct {
@@ -42,7 +42,7 @@ func (w *WorkerPool) Worker(id int) {
 			time.Sleep(task.RunAt.Sub(now))
 		}
 
-		if err := pkg.SendMsg(task.Payload); err != nil {
+		if err := email.SendMsg(task.Payload); err != nil {
 			log.Println("Could not send mail ERROR", err)
 			w.TaskRepo.MarkAsPending(context.Background(), task)
 			continue
