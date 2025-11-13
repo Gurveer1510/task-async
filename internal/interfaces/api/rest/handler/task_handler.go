@@ -43,7 +43,7 @@ func (h *TaskHandler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("error: %v", err), http.StatusInternalServerError)
 		return
 	}
-
+	log.Println("Task created:", newTask)
 	err = h.queue.Enqueue(newTask)	
 	if err != nil {
 		log.Print("ERROR ENQUEUING:", err)
